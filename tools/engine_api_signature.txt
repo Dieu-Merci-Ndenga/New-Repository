@@ -1,8 +1,8 @@
-isRepository
-open
-head
-branches
-commits
-tags
-status
-close
+proc isRepository
+proc open
+proc head
+proc branches
+proc commits
+proc tags
+proc status
+proc close
