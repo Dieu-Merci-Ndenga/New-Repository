@@ -13,13 +13,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Import rule check
+      - name: Validate (import rules + API contract)
         run: |
-          bash tools/import_rule_check.sh
-
-      - name: Engine API contract check
-        run: |
-          bash tools/check_engine_api.sh
+          bash tools/validate_ci.sh
 
       - name: Install choosenim (Nim + nimble)
         run: |
