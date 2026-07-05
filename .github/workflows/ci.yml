@@ -32,9 +32,13 @@ jobs:
         run: |
           nimble build
 
+      - name: Ensure single test entry
+        run: |
+          bash tools/ensure_single_test_entry.sh
+
       - name: Test
         run: |
-          nimble test
+          bash tools/run_tests_direct.sh
 
       - name: Format check
         run: |
