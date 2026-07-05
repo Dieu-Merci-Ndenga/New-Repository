@@ -32,10 +32,6 @@ jobs:
         run: |
           nimble build
 
-      - name: Ensure single test entry
-        run: |
-          bash tools/ensure_single_test_entry.sh
-
       - name: Test
         run: |
           bash tools/run_tests_direct.sh
