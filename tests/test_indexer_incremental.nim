@@ -1,6 +1,6 @@
 import std/[unittest, os, osproc, strutils, times]
 
-import git/experimental/indexer as indexer
+import git/indexer as indexer
 import common_nim
 
 proc createTempDir(prefix: string): string =
