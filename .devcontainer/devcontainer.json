@@ -1,0 +1,6 @@
+{
+  "name": "New-Repository",
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
+}

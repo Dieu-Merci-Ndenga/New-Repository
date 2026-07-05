@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate (import rules + API contract)
+        run: |
+          bash tools/validate_ci.sh
+
+      - name: Install choosenim (Nim + nimble)
+        run: |
+          curl -fsSL https://nim-lang.org/choosenim/init.sh | sh -s -- -y
+          echo "# Add choosenim to PATH for this runner"
+          echo "export PATH=\"$HOME/.nimble/bin:$HOME/.choosenim/bin:$PATH\"" >> $GITHUB_ENV
+
+      - name: Verify Nim
+        run: |
+          source $HOME/.profile || true
+          nim --version
+
+      - name: Build
+        run: |
+          nimble build
+
+      - name: Test
+        run: |
+          bash tools/run_tests_direct.sh
+
+      - name: Format check
+        run: |
+          nimble fmt

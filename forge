@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+binary="$script_dir/bin/forge"
+
+if [[ ! -x "$binary" || "$script_dir/src/forge.nim" -nt "$binary" || "$script_dir/forge.nimble" -nt "$binary" ]]; then
+  (cd "$script_dir" && nimble build)
+fi
+
+exec "$binary" "$@"

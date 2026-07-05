@@ -1,0 +1,8 @@
+proc isRepository
+proc open
+proc head
+proc branches
+proc commits
+proc tags
+proc status
+proc close
