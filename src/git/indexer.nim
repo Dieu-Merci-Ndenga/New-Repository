@@ -1,6 +1,6 @@
 import std/[strutils, sequtils, os, osproc]
 
-import git.impl_cli as impl, domain
+import git.backend as backend, domain
 
 type
   Index* = object
@@ -11,9 +11,9 @@ type
     authors*: seq[domain.Author]
 
 
-proc parseCommit*(repo: impl.Repository, hash: string): domain.Commit =
+proc parseCommit*(repo: backend.Repository, hash: string): domain.Commit =
   let fmt = "%H%n%an%n%ae%n%ad%n%P%n%B"
-  let txt = impl.runGit(repo.path, @[("show"), ("-s"), ("--format=" & fmt), hash]).text
+  let txt = backend.runGit(repo.path, @[("show"), ("-s"), ("--format=" & fmt), hash]).text
   var lines = txt.splitLines()
   if lines.len < 5:
     raise newException(ValueError, "Unexpected git show output for " & hash)
@@ -29,7 +29,7 @@ proc parseCommit*(repo: impl.Repository, hash: string): domain.Commit =
   if parentsLine.len > 0:
     parents = parentsLine.splitWhitespace()
 
-  let filesOut = impl.runGit(repo.path, @[("show"), ("--name-only"), ("--pretty=") , hash]).text
+  let filesOut = backend.runGit(repo.path, @[("show"), ("--name-only"), ("--pretty=") , hash]).text
   let files = filesOut.splitLines().mapIt(it.strip()).filterIt(it.len > 0)
 
   result = domain.Commit(
@@ -43,14 +43,14 @@ proc parseCommit*(repo: impl.Repository, hash: string): domain.Commit =
 
 
 proc buildIndex*(path: string): Index =
-  let repo = impl.openRepository(path)
+  let repo = backend.openRepository(path)
   var commitsSeq: seq[domain.Commit] = @[]
-  let hashes = impl.getCommits(repo)
+  let hashes = backend.getCommits(repo)
   for h in hashes:
     commitsSeq.add parseCommit(repo, h)
 
-  let branches = impl.getBranches(repo).mapIt(domain.Branch(name: it, targetCommit: ""))
-  let tags = impl.getTags(repo).mapIt(domain.Tag(name: it, targetCommit: ""))
+  let branches = backend.getBranches(repo).mapIt(domain.Branch(name: it, targetCommit: ""))
+  let tags = backend.getTags(repo).mapIt(domain.Tag(name: it, targetCommit: ""))
 
   var authorsSeq: seq[domain.Author] = @[]
   for c in commitsSeq:
@@ -60,7 +60,7 @@ proc buildIndex*(path: string): Index =
   let name = if repo.path.len > 0: repo.path.split("/")[^1] else: repo.path
 
   result = Index(
-    repository: domain.Repository(path: repo.path, name: name, defaultBranch: impl.getHead(repo)),
+    repository: domain.Repository(path: repo.path, name: name, defaultBranch: backend.getHead(repo)),
     commits: commitsSeq,
     branches: branches,
     tags: tags,
